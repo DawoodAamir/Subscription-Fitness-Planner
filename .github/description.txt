@@ -1,0 +1,1 @@
+Native iOS workout planner with StoreKit 2 subscriptions, verified entitlements, local history, and purchase lifecycle tests.
