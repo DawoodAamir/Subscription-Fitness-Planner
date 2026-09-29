@@ -1,5 +1,5 @@
 {
-  "identifier": "fitness-planner-local",
+  "identifier": "B09559C4-47D3-41CC-A572-3E978F238475",
   "nonRenewingSubscriptions": [],
   "products": [],
   "settings": {
@@ -12,7 +12,7 @@
   },
   "subscriptionGroups": [
     {
-      "id": "training",
+      "id": "21234567",
       "localizations": [],
       "name": "Training Membership",
       "subscriptions": [
@@ -22,7 +22,7 @@
           "displayPrice": "4.99",
           "familyShareable": false,
           "groupNumber": 1,
-          "internalID": "monthly",
+          "internalID": "8123456780",
           "introductoryOffer": null,
           "localizations": [
             {
@@ -34,7 +34,7 @@
           "productID": "com.dd.fitnessplanner.monthly",
           "recurringSubscriptionPeriod": "P1M",
           "referenceName": "Monthly membership",
-          "subscriptionGroupID": "training",
+          "subscriptionGroupID": "21234567",
           "type": "RecurringSubscription"
         },
         {
@@ -43,7 +43,7 @@
           "displayPrice": "39.99",
           "familyShareable": false,
           "groupNumber": 1,
-          "internalID": "yearly",
+          "internalID": "8123456781",
           "introductoryOffer": null,
           "localizations": [
             {
@@ -55,7 +55,7 @@
           "productID": "com.dd.fitnessplanner.yearly",
           "recurringSubscriptionPeriod": "P1Y",
           "referenceName": "Yearly membership",
-          "subscriptionGroupID": "training",
+          "subscriptionGroupID": "21234567",
           "type": "RecurringSubscription"
         }
       ]

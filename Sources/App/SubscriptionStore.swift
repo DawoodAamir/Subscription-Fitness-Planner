@@ -1,13 +1,16 @@
-import StoreKit
 import Combine
+import StoreKit
 
 @MainActor
 final class SubscriptionStore: ObservableObject {
-    static let productIDs: Set<String> = ["com.dd.fitnessplanner.monthly", "com.dd.fitnessplanner.yearly"]
+    static let productIDs: Set<String> = [
+        "com.dd.fitnessplanner.monthly", "com.dd.fitnessplanner.yearly",
+    ]
     @Published private(set) var products: [Product] = []
     @Published private(set) var hasPremium = false
     @Published private(set) var isBusy = false
     @Published var message: String?
+    private var entitlementGeneration = 0
     private var updates: Task<Void, Never>?
 
     init() {
@@ -27,22 +30,30 @@ final class SubscriptionStore: ObservableObject {
     func load() async {
         await refreshEntitlements()
         do {
-            products = try await Product.products(for: Self.productIDs).sorted { $0.price < $1.price }
-            if products.isEmpty { message = "Plans are unavailable. Run the shared Xcode scheme with its local StoreKit configuration, or configure products in App Store Connect." }
+            products = try await Product.products(for: Self.productIDs).sorted {
+                $0.price < $1.price
+            }
+            if products.isEmpty {
+                message =
+                    "Plans are unavailable. Run the shared Xcode scheme with its local StoreKit configuration, or configure products in App Store Connect."
+            }
         } catch { message = error.localizedDescription }
     }
 
     func refreshEntitlements() async {
+        entitlementGeneration += 1
+        let generation = entitlementGeneration
         var active = false
         for await result in Transaction.currentEntitlements {
             guard case .verified(let transaction) = result,
-                  Self.productIDs.contains(transaction.productID),
-                  transaction.revocationDate == nil,
-                  !transaction.isUpgraded else { continue }
+                Self.productIDs.contains(transaction.productID),
+                transaction.revocationDate == nil,
+                !transaction.isUpgraded
+            else { continue }
             if let expiry = transaction.expirationDate, expiry <= Date() { continue }
             active = true
         }
-        hasPremium = active
+        if generation == entitlementGeneration { hasPremium = active }
     }
 
     func purchase(_ product: Product) async {
@@ -58,9 +69,13 @@ final class SubscriptionStore: ObservableObject {
                 }
                 await refreshEntitlements()
                 await transaction.finish()
-            case .pending: message = "Your purchase is awaiting approval. Access will update when it is approved."
+            case .pending:
+                message =
+                    "Your purchase is awaiting approval. Access will update when it is approved."
             case .userCancelled: break
-            @unknown default: message = "The purchase returned an unfamiliar status. Please try restoring purchases."
+            @unknown default:
+                message =
+                    "The purchase returned an unfamiliar status. Please try restoring purchases."
             }
         } catch { message = error.localizedDescription }
     }
@@ -72,7 +87,8 @@ final class SubscriptionStore: ObservableObject {
         do {
             try await AppStore.sync()
             await refreshEntitlements()
-            message = hasPremium ? "Your membership is restored." : "No active membership was found."
+            message =
+                hasPremium ? "Your membership is restored." : "No active membership was found."
         } catch { message = error.localizedDescription }
     }
 }
